@@ -1,10 +1,18 @@
-# Claude Hub — multi-agent task orchestration for Claude Code
+# Claude Hub — autonomous multi-agent orchestration for Claude Code
 
-> An open-source Claude Code multi-agent orchestration hub: a file-based task queue where autonomous AI agents (Claude by Anthropic) work in isolated git worktrees, with automated LLM code review and QA — a developer-tools workflow-automation kit and prompt-engineering playbook for any AI coding assistant.
+**Dictate ten tasks at once; get ten verified, locally committed changes.** Claude Hub is a drop-in folder that turns Claude Code into an orchestrator: each request becomes a Session run by a fresh worker agent, checked by an independent QA agent and repaired automatically. When the context fills up, the hub hands off to a new session by itself.
 
-**Dictate ten tasks at once; get ten verified, locally committed fixes.** Claude Hub is a drop-in folder that turns Claude Code (or Claude Desktop → Code) into an orchestrator: every request is logged, split into Sessions, run by a fresh worker agent, checked by an independent QA agent, and repaired automatically.
+**For:** developers who use Claude Code on real repositories and want many tasks done in parallel without babysitting long chats.
 
-No server, no dependencies beyond Git (and optionally Python 3.8+). Works with any stack and any number of repositories, on Windows, macOS and Linux. Russian guide: [README.ru.md](README.ru.md).
+**Key features**
+- **Autonomous session handoff** — near the context limit the hub saves its state, starts a new background session and stops the old one.
+- **Parallel sessions in git worktrees** — workers run in isolated worktrees, one local commit each.
+- **Independent QA + auto-repair** — a reviewer checks the real diff and tests against acceptance criteria; failures spawn repair Sessions.
+- **Safety hooks** — block force-push, history rewrites, author spoofing and writes outside allowed folders.
+- **File-based memory** — goals, rules, decisions and handoffs live in plain Markdown.
+- **No server** — only Git (Python 3.8+ recommended for hooks). Any stack, Windows/macOS/Linux.
+
+Russian guide: [README.ru.md](README.ru.md).
 
 ## Why
 
@@ -33,6 +41,16 @@ flowchart LR
 - **Memory** lives in files: `project/` (profile, invariants, conventions, your standing rules, learnings) and `control/` (goals, decisions, next-session prompt).
 
 Full procedures: [`CLAUDE.md`](CLAUDE.md) and [`orchestration/`](orchestration/).
+
+## Example
+
+A `todo-app` repo is registered. You type: *"Three things: add dark mode, fix the login bug where a wrong password still redirects, write tests for the task list."*
+
+1. The hub logs all three verbatim in `control/INBOX.md` and creates `W001-S001-dark-mode`, `W001-S002-login-redirect`, `W001-S003-tasklist-tests` in `tasks/queued/`, each with acceptance criteria.
+2. Three fresh workers start in parallel, each in its own worktree under `worktrees/`; each makes one local commit and writes a report in `results/`.
+3. QA passes S001 and S003 but fails S002: the redirect is fixed, yet no test covers the wrong-password case. The hub spawns `W001-S002-R01`, a worker adds the test, QA passes it.
+4. `status` shows 3/3 done, all committed locally. Nothing is pushed until you say so.
+5. Later the context nears its limit: the hub writes `control/NEXT-SESSION-PROMPT.md`, starts a new background session that picks up the queue, and the old one stops. You keep dictating.
 
 ## Quick start
 
