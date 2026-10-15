@@ -1,0 +1,1 @@
+Temporary QA worktrees only — `qa-<SESSION-ID>` and its `qa-<SESSION-ID>-*.txt` output files; the QA reviewer removes its own when it finishes, even on failure, and `python tools/hub.py status` warns about leftovers (`orchestration/06_QA_AND_REPAIR.md`).

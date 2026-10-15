@@ -1,0 +1,22 @@
+{
+  "_about": "Machine and project settings read by tools/hub.py and the hooks in .claude/hooks/. Shipped with defaults; hub-setup fills the nulls (orchestration/05_SETUP_PROTOCOL.md, Step 6). Safe to edit by hand; keep it valid JSON. commit.banned is for project-specific extra patterns ({\"pattern\": <regex>, \"why\": <text>}): they are added to the guard's built-in list of hub ids and names (.claude/hooks/safety_guard.py, DEFAULT_BANNED), which this file cannot shrink - so it ships empty and an engine update can refine the built-in list. context_budget ships for a 200k window; on a 1M-context model set context_window 1000000 and warn/handoff/stop 150000/350000/400000 (the hook also does this itself the first time a session passes 200k).",
+  "schema_version": 1,
+  "configured_at": null,
+  "language": null,
+  "python_command": null,
+  "write_roots": [],
+  "commit": {
+    "subject_regex": null,
+    "subject_regex_source": null,
+    "banned": []
+  },
+  "context_budget": {
+    "context_window": 200000,
+    "warn_tokens": 80000,
+    "handoff_tokens": 120000,
+    "stop_tokens": 140000,
+    "calibrated": false,
+    "calibrated_at": null
+  },
+  "ledger_archive_kb": 150
+}

@@ -1,0 +1,2 @@
+# ids.log — every id allocated by `python tools/hub.py next-id`, one per line: <ISO time> <id>
+# Scanned on every allocation so two sessions never receive the same id. Append-only; never edit by hand.
