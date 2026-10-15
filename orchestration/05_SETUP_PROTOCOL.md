@@ -172,6 +172,9 @@ Windows, interpreter `py -3`:
 ```
 macOS/Linux, interpreter `python3`: the same with `"command": "python3"` and
 `"args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/safety_guard.py"]` (and `context_budget.py` likewise).
+Add the autonomous handoff the same way: `session_relay.py` under `"Stop"` (no matcher) and under
+`"PreCompact"` with `"matcher": "auto"`. To keep manual handoffs, set `"relay": {"enabled": false}` in
+`control/hub-config.json`.
 
 **Verify each hook by piping a sample payload through it.** Write two payload files with the Write tool
 into the system temp directory — writing files keeps destructive phrases out of the command line, which a
@@ -184,6 +187,7 @@ Then:
    `"permissionDecision": "deny"`; the allow sample prints nothing.
 2. `<py> tools/guard_test.py` → every case passes.
 3. `<py> .claude/hooks/context_budget.py --selftest` → every scenario PASS.
+   `<py> .claude/hooks/session_relay.py --selftest` → every scenario PASS.
 4. Delete the two sample files.
 A failure here is fixed before setup is reported complete.
 

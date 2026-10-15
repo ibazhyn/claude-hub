@@ -46,13 +46,33 @@ Full procedures: [`CLAUDE.md`](CLAUDE.md) and [`orchestration/`](orchestration/)
    ```
 5. When setup finishes, open a **new session** and write "continue". Then just dictate work.
 
+
+## Autonomous session handoff
+
+Long orchestrator sessions get expensive and eventually compact. The hub hands itself off instead:
+
+1. `context_budget.py` (UserPromptSubmit) warns, then asks for the `hub-handoff` skill at the handoff threshold.
+2. Past the stop threshold, `session_relay.py` (Stop hook) checks that `control/NEXT-SESSION-PROMPT.md` was
+   refreshed; if not, it sends the session back once to write it.
+3. With a fresh handoff, or right before an auto-compaction (PreCompact, matcher `auto`), it writes
+   `control/handoff/RELAY-<stamp>.md`, starts `claude --bg --name hub-relay-<stamp> "<continue prompt>"` in the
+   hub and returns `continue: false` so the old session stops (compaction is blocked).
+4. `control/locks/RELAY.lock` (atomic, stale after 30 min) plus a per-session marker guarantee one relay per
+   session and no double runners. Subagents and manual `/compact` are never relayed.
+
+List or open the new session with `claude agents` / `claude attach <id>`. Configure in `control/hub-config.json`:
+`"relay": {"enabled": true, "command": ["claude", "--bg"], "extra_args": [], "stale_minutes": 30, "fresh_minutes": 20}`.
+Dry run: `HUB_RELAY_DRY_RUN=1`. Tests: `python3 .claude/hooks/session_relay.py --selftest`.
+Limits: a background session cannot answer permission prompts, so `ask` rules (e.g. `git push`) still wait for
+you; the old window stays open but idle.
+
 ## Using it well
 
 - **Batch requests.** "Three things: 1) … 2) … 3) …" becomes three isolated Sessions.
 - **Say rules once.** "From now on, always write a test before the fix" goes to `project/OVERRIDES.md` and applies to every future Session.
 - **Ask `status`** for done / running / queued / waiting-on-you.
 - **Feed context, not chat.** Update files in `context/` and say "refresh context" instead of re-explaining.
-- **Start new sessions freely.** When context grows, the hub prints a ready handoff prompt; paste it or say "continue". Nothing is lost.
+- **Start new sessions freely.** When context grows, the hub writes a handoff and, with the relay hook on, starts the next session itself. Nothing is lost.
 - **Pushing is yours.** Commits stay local until you explicitly ask to push; never forced.
 - **Upgrade safely.** Replace the engine (`CLAUDE.md`, `.claude/`, `orchestration/`, `tools/`, `README*`), keep the state (`project/`, `control/`, `tasks/`, `results/`, `context/`, `archive/`).
 

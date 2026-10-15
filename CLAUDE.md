@@ -137,7 +137,9 @@ from a merely legal one. Details: `04_GIT_SAFETY_AND_COMMITS.md`.
 - One goal = one session. Every call re-reads the whole context, so a session's cost grows with the square
   of its length; several short sessions joined by a good handoff cost far less and lose nothing.
 - Thresholds live in `control/hub-config.json` and `.claude/hooks/context_budget.py` reports them. Past
-  *handoff*, run `hub-handoff`; past *stop*, start no new work. They ship for a 200k window; the hook
+  *handoff*, run `hub-handoff`; past *stop*, start no new work: refresh the handoff and end the turn — the
+  `session_relay.py` Stop/PreCompact hook then starts a fresh background session and stops this one
+  (`control/handoff/RELAY-*.md`; one relay at a time via `control/locks/RELAY.lock`). They ship for a 200k window; the hook
   recalibrates for 1M once a session passes 200k, and when the user says the model has a 1M window, set the
   calibrated values at once.
 - Keep `control/NEXT-SESSION-PROMPT.md` current from mid-session on: a copy-paste prompt for a fresh

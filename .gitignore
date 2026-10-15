@@ -5,3 +5,9 @@ __pycache__/
 *.pyc
 .DS_Store
 .~lock.*
+
+# session relay runtime
+control/handoff/
+control/locks/RELAY.lock
+control/locks/RELAYED-*
+.claude/hooks/*.err

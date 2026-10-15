@@ -41,7 +41,7 @@ the formats and the reasons. The setup session edits only hub files — never pr
    writes the project layer and returns at most 40 lines. Never read the raw files yourself.
 6. **Wire the machine:** hooks into `.claude/settings.local.json` with the detected interpreter, in the
    protocol's exact shape; verify (a sample `git reset --hard` payload comes back denied,
-   `python tools/guard_test.py` passes, `python .claude/hooks/context_budget.py --selftest` passes); fill
+   `python tools/guard_test.py` passes, `python .claude/hooks/context_budget.py --selftest` and `python .claude/hooks/session_relay.py --selftest` pass); fill
    `control/hub-config.json` (language, python command, write roots, commit subject regex that always
    includes the conventional form). No Python → hooks stay off; say so plainly; the contract still binds.
 7. **Held tasks:** goal file and `OPEN_GOALS.md` row `PAUSED`, owner `setup` + Session MDs now

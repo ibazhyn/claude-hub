@@ -145,8 +145,8 @@ def advise(ctx, calls, cost, b, calibrated_now):
            "holds 150k / 350k / 400k.)") if calibrated_now else ""
     if ctx >= b["stop_tokens"]:
         return (head + " PAST THE STOP THRESHOLD (%dk). Do not start new work in this session. Finish only the "
-                "step in hand, run the hub-handoff skill, and tell the user at the TOP of your reply, in their "
-                "language, to open a fresh session, with the prompt pasted inline." % (b["stop_tokens"] // 1000)
+                "step in hand, run the hub-handoff skill, then end the turn: the session-relay hook starts the "
+                "next session by itself (if relay is disabled, tell the user at the TOP of your reply to open one)." % (b["stop_tokens"] // 1000)
                 + cal)
     if ctx >= b["handoff_tokens"]:
         return (head + " HANDOFF THRESHOLD (%dk) PASSED. Run the hub-handoff skill now: refresh "
